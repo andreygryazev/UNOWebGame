@@ -1,27 +1,27 @@
-# 🃏 UNO Clone Universal — Real-Time Multiplayer Card Game
+# 🃏 UNO Clone Universal - Real-Time Multiplayer Card Game
 
-A modern, full-stack UNO game built with React, Node.js & Socket.io — play with friends online or challenge bots offline!
+A modern, full-stack UNO game built with React, Node.js & Socket.io - play with friends online or challenge bots offline!
 
 ## 🎮 How It Works
 
 - Create or join a **lobby** with friends via multiplayer, or start a **bot match** solo.
-- Play cards following standard **UNO rules** — match by color or number.
+- Play cards following standard **UNO rules** - match by color or number.
 - Use **action cards** (Skip, Reverse, Draw 2, Wild, Wild Draw 4) to gain the upper hand.
 - First player to empty their hand **wins** and earns coins.
 - Spend coins in the **shop** on custom card skins & table backgrounds.
 
 ## ✨ Features
 
-- 🌐 **Real-Time Multiplayer** — play with friends via Socket.io rooms
-- 🤖 **Smart Bots** — single-player mode with intelligent AI opponents
-- 🎴 **Full UNO Rules** — Draw 2, Skip, Reverse, Wild, Wild Draw 4, 7-0 swap & more
-- 🛒 **Shop & Inventory** — earn coins and buy custom card skins & table backgrounds
-- 👤 **Profile System** — track stats, MMR rating & customize your avatar
-- 😎 **Emotes** — react during games with emote bubbles
-- ⏱️ **Turn Timer** — keeps the game moving
-- 🔊 **Sound Effects** — immersive SFX powered by Howler.js
-- 🔐 **Auth System** — JWT-based login & registration with bcrypt
-- 📱 **Responsive Design** — works on desktop and mobile
+- 🌐 **Real-Time Multiplayer** - play with friends via Socket.io rooms
+- 🤖 **Smart Bots** - single-player mode with intelligent AI opponents
+- 🎴 **Full UNO Rules** - Draw 2, Skip, Reverse, Wild, Wild Draw 4, 7-0 swap & more
+- 🛒 **Shop & Inventory** - earn coins and buy custom card skins & table backgrounds
+- 👤 **Profile System** - track stats, MMR rating & customize your avatar
+- 😎 **Emotes** - react during games with emote bubbles
+- ⏱️ **Turn Timer** - keeps the game moving
+- 🔊 **Sound Effects** - immersive SFX powered by Howler.js
+- 🔐 **Auth System** - JWT-based login & registration with bcrypt
+- 📱 **Responsive Design** - works on desktop and mobile
 
 ## 📋 Game Modes
 
