@@ -1,0 +1,5 @@
+{
+  "name": "UnoClone-React",
+  "description": "A fully functional UNO-style card game with an authoritative game engine architecture, simulating a real-time multiplayer environment.",
+  "requestFramePermissions": []
+}
