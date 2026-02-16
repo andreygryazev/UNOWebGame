@@ -1,4 +1,4 @@
-# 🃏 UNO Clone Universal - Real-Time Multiplayer Card Game
+# 🃏 UNOWebGame - Real-Time Multiplayer Card Game
 
 A modern, full-stack UNO game built with React, Node.js & Socket.io - play with friends online or challenge bots offline!
 
