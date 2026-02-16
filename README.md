@@ -51,8 +51,8 @@ A modern, full-stack UNO game built with React, Node.js & Socket.io — play wit
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd uno-clone-universal
+   git clone https://github.com/andreygryazev/UNOWebGame.git
+   cd UNOWebGame
    ```
 
 2. Install dependencies:
