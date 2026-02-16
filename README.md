@@ -74,6 +74,4 @@ npm run dev
 - `public/`: Static assets
 - `dist/`: Build output (generated)
 
-## License
 
-MIT
