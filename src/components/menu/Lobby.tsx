@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, GameState, GameMode } from '../types.ts';
+import { User, GameState, GameMode } from '../../types.ts';
 import { ArrowLeft, Users, Plus, Copy, Check } from 'lucide-react';
 import { Socket } from 'socket.io-client';
 import { motion, AnimatePresence } from 'framer-motion';

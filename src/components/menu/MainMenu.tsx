@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { User } from '../types.ts';
+import { User } from '../../types.ts';
 import { Play, Users, User as UserIcon, LogOut, ShoppingCart, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { getAvatarUrl } from '../utils/avatarHelper.ts';
+import { getAvatarUrl } from '../../utils/avatarHelper.ts';
 
 interface Props {
   user: Omit<User, 'password_hash'>;

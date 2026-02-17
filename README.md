@@ -104,13 +104,29 @@ UNO/
 │   ├── index.tsx          # Entry point
 │   ├── index.css          # Global styles
 │   ├── types.ts           # TypeScript types
-│   ├── components/        # 19 React components
-│   │   ├── GameTable.tsx   # Main game board
-│   │   ├── CardComponent.tsx
-│   │   ├── Lobby.tsx
-│   │   ├── ShopModal.tsx
-│   │   ├── InventoryModal.tsx
-│   │   └── ...
+│   ├── components/
+│   │   ├── game/          # In-game components
+│   │   │   ├── GameTable.tsx
+│   │   │   ├── CardComponent.tsx
+│   │   │   ├── PlayerAvatar.tsx
+│   │   │   ├── DirectionIndicator.tsx
+│   │   │   ├── WildColorModal.tsx
+│   │   │   ├── PlayerSelectModal.tsx
+│   │   │   ├── GameOverModal.tsx
+│   │   │   ├── UnoButton.tsx
+│   │   │   ├── TurnTimer.tsx
+│   │   │   ├── EmoteMenu.tsx
+│   │   │   └── EmoteBubble.tsx
+│   │   ├── menu/          # Menu & navigation screens
+│   │   │   ├── Auth.tsx
+│   │   │   ├── MainMenu.tsx
+│   │   │   ├── ModeSelector.tsx
+│   │   │   ├── Lobby.tsx
+│   │   │   ├── Profile.tsx
+│   │   │   └── AvatarSelector.tsx
+│   │   └── shop/          # Shop & inventory system
+│   │       ├── ShopModal.tsx
+│   │       └── InventoryModal.tsx
 │   ├── services/          # Game logic & networking
 │   │   ├── GameEngine.ts   # Core UNO game engine
 │   │   ├── BotLogic.ts     # AI bot behavior

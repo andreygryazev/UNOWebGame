@@ -1,7 +1,7 @@
 import type { Card, GameState, Player, GameMode, GameRules } from '../types.ts';
 import { CardColor, CardValue, GameStatus } from '../types.ts';
 import { calculateBotMove } from './BotLogic.ts';
-import { run, get } from '../server/db.ts';
+import { run, get } from '../../server/db.ts';
 
 /**
  * Phase 2 & 5: Game Engine with Bot Logic & DB Integration

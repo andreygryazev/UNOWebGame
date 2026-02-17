@@ -1,6 +1,6 @@
 import React from 'react';
-import { CardColor } from '../types.ts';
-import { CARD_COLORS_MAP } from '../constants';
+import { CardColor } from '../../types.ts';
+import { CARD_COLORS_MAP } from '../../constants';
 import { Check } from 'lucide-react';
 
 interface Props {

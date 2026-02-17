@@ -40,7 +40,7 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, loading, error 
             UNO
           </h1>
           <p className="text-slate-300 font-medium tracking-[0.2em] text-sm mt-2 uppercase opacity-80">
-            Universal Online
+            Web Game
           </p>
         </div>
 

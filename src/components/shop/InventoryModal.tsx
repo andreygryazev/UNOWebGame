@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Package, Image, CreditCard, RotateCcw } from 'lucide-react';
-import { SHOP_DATA } from '../constants/shopData';
-import { CardComponent } from './CardComponent';
-import { CardColor, CardValue } from '../types';
+import { SHOP_DATA } from '../../constants/shopData';
+import { CardComponent } from '../game/CardComponent';
+import { CardColor, CardValue } from '../../types';
 
 interface Props {
   isOpen: boolean;

@@ -6,8 +6,8 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { login, register } from './auth.ts';
 import { get, run, db } from './db.ts';
-import { GameEngine } from '../services/GameEngine.ts';
-import { roomManager } from '../services/RoomManager.ts';
+import { GameEngine } from '../src/services/GameEngine.ts';
+import { roomManager } from '../src/services/RoomManager.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -71,7 +71,7 @@ app.post('/api/user/avatar', async (req, res) => {
 
 // --- SHOP SYSTEM ---
 
-import { SHOP_DATA } from '../constants/shopData.ts';
+import { SHOP_DATA } from '../src/constants/shopData.ts';
 
 // ... (existing imports)
 

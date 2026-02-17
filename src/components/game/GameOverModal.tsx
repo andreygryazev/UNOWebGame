@@ -1,5 +1,5 @@
 import React from 'react';
-import { GameState } from '../types.ts';
+import { GameState } from '../../types.ts';
 import { PlayerAvatar } from './PlayerAvatar.tsx';
 import { motion } from 'framer-motion';
 

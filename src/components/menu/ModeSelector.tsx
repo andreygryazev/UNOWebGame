@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Zap, Skull, Repeat, Users, Layers } from 'lucide-react';
-import type { GameMode } from '../types';
+import type { GameMode } from '../../types';
 
 interface ModeSelectorProps {
   onSelect: (mode: GameMode) => void;

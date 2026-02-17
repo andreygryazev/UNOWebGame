@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { GameState, CardColor, CardValue } from '../types.ts';
+import { GameState, CardColor, CardValue } from '../../types.ts';
 import { CardComponent } from './CardComponent.tsx';
 import { WildColorModal } from './WildColorModal.tsx';
 import { PlayerSelectModal } from './PlayerSelectModal.tsx';
 import { DirectionIndicator } from './DirectionIndicator.tsx';
 import { PlayerAvatar } from './PlayerAvatar.tsx';
-import { socket } from '../services/socket.ts';
+import { socket } from '../../services/socket.ts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Howl } from 'howler';
 
@@ -33,14 +33,7 @@ const emoteSfx = new Howl({
 });
 
 export const GameTable: React.FC<GameTableProps> = ({ gameState, myPlayerId, onPlayCard, onDrawCard, onPassTurn, onBackToMenu, equippedTable = 'default', equippedCard = 'classic' }) => {
-  if (!gameState || !gameState.players) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-slate-950 text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-      </div>
-    );
-  }
-
+  // ALL hooks MUST be called before any early returns (React Rules of Hooks)
   const [selectedWildId, setSelectedWildId] = useState<string | null>(null);
   const [showWildModal, setShowWildModal] = useState(false);
   
@@ -49,9 +42,6 @@ export const GameTable: React.FC<GameTableProps> = ({ gameState, myPlayerId, onP
   const [pendingCardId, setPendingCardId] = useState<string | null>(null);
 
   const [playerEmotes, setPlayerEmotes] = useState<Record<string, { id: string; timestamp: number } | null>>({});
-  
-  const myIndex = gameState.players.findIndex(p => p.id === myPlayerId);
-  const totalPlayers = gameState.players.length;
 
   // Emote System
   useEffect(() => {
@@ -81,6 +71,18 @@ export const GameTable: React.FC<GameTableProps> = ({ gameState, myPlayerId, onP
       socket.off('emoteReceived', handleEmoteReceived);
     };
   }, []);
+
+  // Early return AFTER all hooks
+  if (!gameState || !gameState.players) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-slate-950 text-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+  
+  const myIndex = gameState.players.findIndex(p => p.id === myPlayerId);
+  const totalPlayers = gameState.players.length;
 
   const handleEmoteSelect = (emoteId: string) => {
     socket.emit('sendEmote', {

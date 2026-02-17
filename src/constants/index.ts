@@ -1,4 +1,4 @@
-import { CardColor } from './types.ts';
+import { CardColor } from '../types.ts';
 
 export const CARD_COLORS_MAP: Record<CardColor, string> = {
   [CardColor.RED]: 'bg-red-500',

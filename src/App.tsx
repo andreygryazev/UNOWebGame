@@ -4,14 +4,14 @@ import { socket, connectSocket } from './services/socket.ts';
 import { User, GameState, GameMode } from './types.ts';
 
 // Components
-import { Auth } from './components/Auth.tsx';
-import { MainMenu } from './components/MainMenu.tsx';
-import { Lobby } from './components/Lobby.tsx';
-import { Profile } from './components/Profile.tsx';
-import { GameTable } from './components/GameTable.tsx'; 
-import { ModeSelector } from './components/ModeSelector.tsx';
-import { ShopModal } from './components/ShopModal.tsx';
-import { InventoryModal } from './components/InventoryModal.tsx';
+import { Auth } from './components/menu/Auth.tsx';
+import { MainMenu } from './components/menu/MainMenu.tsx';
+import { Lobby } from './components/menu/Lobby.tsx';
+import { Profile } from './components/menu/Profile.tsx';
+import { GameTable } from './components/game/GameTable.tsx'; 
+import { ModeSelector } from './components/menu/ModeSelector.tsx';
+import { ShopModal } from './components/shop/ShopModal.tsx';
+import { InventoryModal } from './components/shop/InventoryModal.tsx';
 
 type ViewState = 'AUTH' | 'MENU' | 'LOBBY' | 'PROFILE' | 'GAME';
 
@@ -263,7 +263,8 @@ export default function App() {
                 avatarId: user.avatar_id,
                 mode
               });
-              setView('GAME');
+              // Don't setView('GAME') here — the socket 'gameState' listener
+              // will transition to GAME view when the server sends the game state
             } else if (pendingView === 'lobby') {
               setView('LOBBY');
             }

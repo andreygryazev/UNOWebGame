@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getAvatarUrl } from '../utils/avatarHelper.ts';
+import { getAvatarUrl } from '../../utils/avatarHelper.ts';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 

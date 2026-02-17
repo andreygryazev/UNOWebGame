@@ -1,8 +1,8 @@
 {
   "type": "module",
-  "name": "uno-clone-universal",
+  "name": "uno-web-game",
   "version": "2.0.0",
-  "description": "Universal Uno Clone (Local & VPS)",
+  "description": "UNO Web Game - Real-Time Multiplayer Card Game",
   "main": "server/index.ts",
   "scripts": {
     "dev": "concurrently \"vite\" \"nodemon --watch server --exec node --loader ts-node/esm server/index.ts\"",

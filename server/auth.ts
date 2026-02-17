@@ -1,7 +1,7 @@
 import { get, run } from './db.ts';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import type { User, AuthResponse } from '../types.ts';
+import type { User, AuthResponse } from '../src/types.ts';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key';
 

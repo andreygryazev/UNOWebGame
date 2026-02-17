@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardColor, CardValue } from '../types.ts';
+import { Card, CardColor, CardValue } from '../../types.ts';
 
 interface CardProps {
   card: Card;

@@ -1,10 +1,10 @@
 import React from 'react';
-import { User } from '../types.ts';
+import { User } from '../../types.ts';
 import { ArrowLeft, Trophy, BarChart2 } from 'lucide-react';
-import { api } from '../services/api.ts';
+import { api } from '../../services/api.ts';
 import { motion } from 'framer-motion';
 import { AvatarSelector } from './AvatarSelector.tsx';
-import { getAvatarUrl } from '../utils/avatarHelper.ts';
+import { getAvatarUrl } from '../../utils/avatarHelper.ts';
 
 interface Props {
   user: Omit<User, 'password_hash'>;

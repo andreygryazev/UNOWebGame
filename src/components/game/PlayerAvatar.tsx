@@ -1,7 +1,7 @@
 import React from 'react';
-import { Player } from '../types.ts';
+import { Player } from '../../types.ts';
 import { TurnTimer } from './TurnTimer.tsx';
-import { getAvatarUrl } from '../utils/avatarHelper.ts';
+import { getAvatarUrl } from '../../utils/avatarHelper.ts';
 import { EmoteBubble } from './EmoteBubble.tsx';
 
 interface Props {
