@@ -595,4 +595,61 @@ export class GameEngine {
         }
     }, delay);
   }
+
+  // --- Lifecycle Management ---
+
+  /**
+   * Cleanly destroy the engine instance.
+   * Clears all timers and removes all subscribers to prevent memory leaks.
+   */
+  public destroy() {
+    clearTimeout(this.botTimeout);
+    clearTimeout(this.turnTimeout);
+    this.botTimeout = null;
+    this.turnTimeout = null;
+    this.subscribers = [];
+    this.deck = [];
+    console.log(`[Engine] Room ${this.roomId} destroyed. All timers cleared.`);
+  }
+
+  /**
+   * Remove a human player from the game (on disconnect).
+   * Returns the updated player count (excluding bots).
+   */
+  public removePlayer(playerId: string): number {
+    const idx = this.state.players.findIndex(p => p.id === playerId && !p.isBot);
+    if (idx === -1) return this.getHumanCount();
+
+    const player = this.state.players[idx];
+    console.log(`[Engine] Player ${player.name} removed from room ${this.roomId}`);
+    this.state.players.splice(idx, 1);
+
+    // If game was in progress and only bots remain, end the game
+    if (this.state.status === GameStatus.PLAYING && this.getHumanCount() === 0) {
+      console.log(`[Engine] No human players left in ${this.roomId}. Ending game.`);
+      clearTimeout(this.botTimeout);
+      clearTimeout(this.turnTimeout);
+      this.state.status = GameStatus.GAME_OVER;
+      this.state.message = 'All players left.';
+      this.broadcast();
+    } else if (this.state.status === GameStatus.PLAYING) {
+      // Adjust turnIndex if needed
+      if (this.state.turnIndex >= this.state.players.length) {
+        this.state.turnIndex = 0;
+      }
+      this.broadcast();
+    }
+
+    return this.getHumanCount();
+  }
+
+  /** Count of human (non-bot) players */
+  public getHumanCount(): number {
+    return this.state.players.filter(p => !p.isBot).length;
+  }
+
+  /** Whether game has ended */
+  public isGameOver(): boolean {
+    return this.state.status === GameStatus.GAME_OVER;
+  }
 }

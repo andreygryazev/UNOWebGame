@@ -164,11 +164,17 @@ app.get('/api/inventory/:userId', async (req, res) => {
 
 // --- SOCKET.IO GAME LOOP ---
 
+// Track socket → room/player mapping for cleanup on disconnect
+const socketRooms = new Map<string, { roomId: string; playerId: string }>();
+
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
   socket.on('joinRoom', ({ roomId, username, userId, avatarId, mode }) => {
     socket.join(roomId);
+    
+    // Track this socket's room for disconnect cleanup
+    socketRooms.set(socket.id, { roomId, playerId: userId?.toString() || '' });
     
     // Auto-create logic if room doesn't exist (Simplified Phase 3)
     let engine = roomManager.getRoom(roomId);
@@ -186,8 +192,7 @@ io.on('connection', (socket) => {
 
     // Send initial state
     socket.emit('gameState', engine.getState());
-    // Note: The engine.addPlayer above triggers a broadcast via the subscription we just added (or existing one)
-    // So we don't strictly need io.to(roomId).emit here, but it's fine.
+    roomManager.touchRoom(roomId); // Refresh TTL
   });
 
   socket.on('startBotGame', ({ username, userId, avatarId, mode }) => {
@@ -196,13 +201,14 @@ io.on('connection', (socket) => {
     const { engine } = roomManager.createRoom(username, userId, roomId, avatarId || 1, mode || 'standard');
     
     // CRITICAL FIX: Subscribe IO to Engine Updates
-    // This ensures that when Bots play (via setTimeout), the state is broadcasted.
-    // We only need to subscribe once per room creation.
     engine.subscribe((state) => {
         io.to(roomId).emit('gameState', state);
     });
     
     socket.join(roomId);
+    
+    // Track this socket's room for disconnect cleanup
+    socketRooms.set(socket.id, { roomId, playerId: userId?.toString() || '' });
 
     // 2. Add 3 Bots immediately with random avatars (1-12)
     engine.addPlayer('Bot Alpha', true, undefined, Math.floor(Math.random() * 12) + 1);
@@ -212,7 +218,7 @@ io.on('connection', (socket) => {
     // 3. Start Game immediately
     engine.startGame();
 
-    // 4. Send state to client (Redundant due to subscribe, but safe for initial load)
+    // 4. Send state to client
     io.to(roomId).emit('gameState', engine.getState());
   });
 
@@ -301,7 +307,21 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
-    emoteTimestamps.delete(socket.id); // Cleanup
+    emoteTimestamps.delete(socket.id); // Cleanup emote tracking
+    
+    // --- Room Cleanup on Disconnect ---
+    const tracked = socketRooms.get(socket.id);
+    if (tracked) {
+      const { roomId, playerId } = tracked;
+      console.log(`[Cleanup] Socket ${socket.id} was in room ${roomId} as player ${playerId}`);
+      
+      const roomDestroyed = roomManager.handlePlayerDisconnect(roomId, playerId);
+      if (roomDestroyed) {
+        console.log(`[Cleanup] Room ${roomId} auto-deleted (no humans left)`);
+      }
+      
+      socketRooms.delete(socket.id);
+    }
   });
 });
 
