@@ -47,3 +47,22 @@ export const login = async (username: string, password: string): Promise<AuthRes
     const { password_hash, ...safeUser } = user;
     return { token, user: safeUser };
 };
+
+export const authenticateJWT = (req: any, res: any, next: any) => {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+
+        jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
+            if (err) {
+                return res.sendStatus(403);
+            }
+
+            req.user = user;
+            next();
+        });
+    } else {
+        res.sendStatus(401);
+    }
+};

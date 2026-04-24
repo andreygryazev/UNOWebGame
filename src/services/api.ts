@@ -5,8 +5,15 @@ import { AuthResponse, User } from '../types.ts';
 const BASE_URL = '/api';
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const token = localStorage.getItem('token');
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${BASE_URL}${endpoint}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     ...options,
   });
   

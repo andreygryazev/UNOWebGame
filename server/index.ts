@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import path from 'path';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
-import { login, register } from './auth.ts';
+import { login, register, authenticateJWT } from './auth.ts';
 import { get, run, db } from './db.ts';
 import { GameEngine } from '../src/services/GameEngine.ts';
 import { roomManager } from '../src/services/RoomManager.ts';
@@ -51,13 +51,13 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-app.get('/api/user/:id', async (req, res) => {
+app.get('/api/user/:id', authenticateJWT, async (req, res) => {
   const user = await get('SELECT id, username, mmr, wins, losses, avatar_id, coins, equipped_table, equipped_card FROM users WHERE id = ?', req.params.id);
   if (user) res.json(user);
   else res.status(404).json({ error: 'User not found' });
 });
 
-app.post('/api/user/avatar', async (req, res) => {
+app.post('/api/user/avatar', authenticateJWT, async (req, res) => {
   try {
     const { userId, avatarId } = req.body;
     if (!userId || !avatarId) throw new Error('Missing fields');
@@ -75,7 +75,7 @@ import { SHOP_DATA } from '../src/constants/shopData.ts';
 
 // ... (existing imports)
 
-app.post('/api/shop/buy', async (req, res) => {
+app.post('/api/shop/buy', authenticateJWT, async (req, res) => {
   try {
     const { userId, itemId } = req.body;
     if (!userId || !itemId) throw new Error('Missing fields');
@@ -129,7 +129,7 @@ app.post('/api/shop/buy', async (req, res) => {
   }
 });
 
-app.post('/api/inventory/equip', async (req, res) => {
+app.post('/api/inventory/equip', authenticateJWT, async (req, res) => {
   try {
     const { userId, type, value } = req.body;
     if (!userId || !type || !value) throw new Error('Missing fields');
@@ -147,7 +147,7 @@ app.post('/api/inventory/equip', async (req, res) => {
   }
 });
 
-app.get('/api/inventory/:userId', async (req, res) => {
+app.get('/api/inventory/:userId', authenticateJWT, async (req, res) => {
   try {
     const userId = req.params.userId;
     const items = await new Promise((resolve, reject) => {
@@ -164,17 +164,11 @@ app.get('/api/inventory/:userId', async (req, res) => {
 
 // --- SOCKET.IO GAME LOOP ---
 
-// Track socket → room/player mapping for cleanup on disconnect
-const socketRooms = new Map<string, { roomId: string; playerId: string }>();
-
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
   socket.on('joinRoom', ({ roomId, username, userId, avatarId, mode }) => {
     socket.join(roomId);
-    
-    // Track this socket's room for disconnect cleanup
-    socketRooms.set(socket.id, { roomId, playerId: userId?.toString() || '' });
     
     // Auto-create logic if room doesn't exist (Simplified Phase 3)
     let engine = roomManager.getRoom(roomId);
@@ -192,7 +186,8 @@ io.on('connection', (socket) => {
 
     // Send initial state
     socket.emit('gameState', engine.getState());
-    roomManager.touchRoom(roomId); // Refresh TTL
+    // Note: The engine.addPlayer above triggers a broadcast via the subscription we just added (or existing one)
+    // So we don't strictly need io.to(roomId).emit here, but it's fine.
   });
 
   socket.on('startBotGame', ({ username, userId, avatarId, mode }) => {
@@ -201,14 +196,13 @@ io.on('connection', (socket) => {
     const { engine } = roomManager.createRoom(username, userId, roomId, avatarId || 1, mode || 'standard');
     
     // CRITICAL FIX: Subscribe IO to Engine Updates
+    // This ensures that when Bots play (via setTimeout), the state is broadcasted.
+    // We only need to subscribe once per room creation.
     engine.subscribe((state) => {
         io.to(roomId).emit('gameState', state);
     });
     
     socket.join(roomId);
-    
-    // Track this socket's room for disconnect cleanup
-    socketRooms.set(socket.id, { roomId, playerId: userId?.toString() || '' });
 
     // 2. Add 3 Bots immediately with random avatars (1-12)
     engine.addPlayer('Bot Alpha', true, undefined, Math.floor(Math.random() * 12) + 1);
@@ -218,7 +212,7 @@ io.on('connection', (socket) => {
     // 3. Start Game immediately
     engine.startGame();
 
-    // 4. Send state to client
+    // 4. Send state to client (Redundant due to subscribe, but safe for initial load)
     io.to(roomId).emit('gameState', engine.getState());
   });
 
@@ -228,18 +222,9 @@ io.on('connection', (socket) => {
 
      if (type === 'START_GAME') {
         engine.startGame();
-     } else if (type === 'DRAW') {
-        engine.drawCard(payload.userId);
-     } else if (type === 'PLAY') {
-        engine.playCard(payload.userId, payload.cardId, payload.color);
      } else if (type === 'ADD_BOT') {
         engine.addPlayer(`Bot ${Date.now().toString().slice(-4)}`, true, undefined, Math.floor(Math.random() * 12) + 1);
-     } else if (type === 'PASS') {
-        engine.passTurn(payload.userId);
      }
-
-     // Broadcast new state
-     io.to(roomId).emit('gameState', engine.getState());
   });
 
   // --- INDIVIDUAL EVENT HANDLERS (Matching Frontend) ---
@@ -247,9 +232,6 @@ io.on('connection', (socket) => {
     const engine = roomManager.getRoom(roomId);
     if (engine) {
         engine.playCard(playerId, cardId, color, targetPlayerId);
-        // State broadcast handled by subscription or we can emit here too
-        // engine.subscribe handles it, but let's be safe
-        io.to(roomId).emit('gameState', engine.getState());
     }
   });
 
@@ -257,7 +239,6 @@ io.on('connection', (socket) => {
     const engine = roomManager.getRoom(roomId);
     if (engine) {
         engine.drawCard(playerId);
-        io.to(roomId).emit('gameState', engine.getState());
     }
   });
 
@@ -265,7 +246,6 @@ io.on('connection', (socket) => {
     const engine = roomManager.getRoom(roomId);
     if (engine) {
         engine.passTurn(playerId);
-        io.to(roomId).emit('gameState', engine.getState());
     }
   });
 
@@ -305,23 +285,22 @@ io.on('connection', (socket) => {
     // State is automatically broadcast via engine.broadcast()
   });
 
+  socket.on('disconnecting', () => {
+    for (const roomId of socket.rooms) {
+      if (roomId === socket.id) continue;
+      
+      const room = io.sockets.adapter.rooms.get(roomId);
+      // If room.size is 1, this socket is the last one leaving
+      if (room && room.size === 1) {
+         console.log(`[Server] Room ${roomId} is empty. Deleting room...`);
+         roomManager.deleteRoom(roomId);
+      }
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
-    emoteTimestamps.delete(socket.id); // Cleanup emote tracking
-    
-    // --- Room Cleanup on Disconnect ---
-    const tracked = socketRooms.get(socket.id);
-    if (tracked) {
-      const { roomId, playerId } = tracked;
-      console.log(`[Cleanup] Socket ${socket.id} was in room ${roomId} as player ${playerId}`);
-      
-      const roomDestroyed = roomManager.handlePlayerDisconnect(roomId, playerId);
-      if (roomDestroyed) {
-        console.log(`[Cleanup] Room ${roomId} auto-deleted (no humans left)`);
-      }
-      
-      socketRooms.delete(socket.id);
-    }
+    emoteTimestamps.delete(socket.id); // Cleanup
   });
 });
 

@@ -78,6 +78,7 @@ export default function App() {
         ? await api.login(username, password)
         : await api.register(username, password);
       
+      localStorage.setItem('token', response.token);
       setUser(response.user);
       connectSocket();
       setView('MENU');
@@ -89,6 +90,7 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
     setUser(null);
     setView('AUTH');
     setGameState(null);
