@@ -1,9 +1,25 @@
 import { get, run } from './db.ts';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import type { User, AuthResponse } from '../src/types.ts';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key';
+// Load environment variables from .env.local
+dotenv.config({ path: '.env.local' });
+
+// JWT Secret: MUST be set in production, fallback only in development
+const isProd = process.env.NODE_ENV === 'production';
+
+if (!process.env.JWT_SECRET && isProd) {
+    console.error('❌ FATAL: JWT_SECRET is not set in environment variables. Server cannot start in production without it.');
+    process.exit(1);
+}
+
+if (!process.env.JWT_SECRET) {
+    console.warn('⚠️  WARNING: JWT_SECRET not set. Using insecure dev fallback. Set JWT_SECRET in .env.local for production.');
+}
+
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-DO-NOT-USE-IN-PROD';
 
 export const register = async (username: string, password: string): Promise<AuthResponse> => {
     // Check existing

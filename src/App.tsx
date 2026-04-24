@@ -63,8 +63,7 @@ export default function App() {
   const loadInventory = async () => {
     if (!user) return;
     try {
-      const response = await fetch(`http://localhost:3000/api/inventory/${user.id}`);
-      const items = await response.json();
+      const items = await api.getInventory(user.id);
       setOwnedItems(items.map((item: any) => item.item_id));
     } catch (err) {
       console.error('Failed to load inventory:', err);
@@ -103,14 +102,7 @@ export default function App() {
       const item = SHOP_DATA.find((i: any) => i.id === itemId);
       if (!item) throw new Error('Item not found');
 
-      const response = await fetch('http://localhost:3000/api/shop/buy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, itemId, type: item.type, price })
-      });
-
-      const data = await response.json();
-      if (!data.success) throw new Error(data.error);
+      const data = await api.buyItem(user.id, itemId);
 
       // Update owned items
       const newOwned = [...ownedItems, itemId];
@@ -131,14 +123,7 @@ export default function App() {
   const handleEquip = async (type: 'table' | 'card', value: string) => {
     if (!user) return;
     try {
-      const response = await fetch('http://localhost:3000/api/inventory/equip', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, type, value })
-      });
-
-      const data = await response.json();
-      if (!data.success) throw new Error(data.error);
+      await api.equipItem(user.id, type, value);
 
       // Update local state
       if (type === 'table') {
